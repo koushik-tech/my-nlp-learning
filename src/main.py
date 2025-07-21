@@ -56,6 +56,17 @@ pos_tags = pos_tag(tokens)
 named_entities = ne_chunk(pos_tags)
 print(f"Named Entities : {named_entities}")
 
+# Stopword Removal
+
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+text = "Netaji Subhash chandra Bose was bron in Cuttak, Odisha. He is the superman on earth."
+tokens = word_tokenize(text)
+removed_stopwords = [word for word in tokens if word.lower() not in stopwords.words("english")]
+print(f"removed_stopwords : {removed_stopwords}")
+
+
 # Vectorization using NLTK
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -104,7 +115,7 @@ texts = [
     "I love this movie",         # positive
     "This film is terrible",     # negative
     "Absolutely great!",         # positive
-    "Worst acting ever",         # negative         
+    "Worst acting ever",         # negative
     "Excellent direction",       # positive
     "Not worth watching",        # negative
     "Amazing experience",        # positive
