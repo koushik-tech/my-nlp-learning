@@ -26,13 +26,13 @@ print(f"Stem interested : {porter.stem('interested')}")
 
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
-print(f"Lemmatizer PLAY : {lemmatizer.lemmatize("play","v")}")
-print(f"Lemmatizer PLAYED : {lemmatizer.lemmatize("played","v")}")
-print(f"Lemmatizer PLAYER : {lemmatizer.lemmatize("player","n")}")
-print(f"Lemmatizer PLAYING : {lemmatizer.lemmatize("playing","v")}")
-print(f"Lemmatizer Communication : {lemmatizer.lemmatize("Communication","v")}")
-print(f"Lemmatizer International : {lemmatizer.lemmatize("International","v")}")
-print(f"Lemmatizer interested : {lemmatizer.lemmatize("interested","v")}")
+print(f"Lemmatizer PLAY : {lemmatizer.lemmatize('play','v')}")
+print(f"Lemmatizer PLAYED : {lemmatizer.lemmatize('played','v')}")
+print(f"Lemmatizer PLAYER : {lemmatizer.lemmatize('player','n')}")
+print(f"Lemmatizer PLAYING : {lemmatizer.lemmatize('playing','v')}")
+print(f"Lemmatizer Communication : {lemmatizer.lemmatize('Communication','v')}")
+print(f"Lemmatizer International : {lemmatizer.lemmatize('International','v')}")
+print(f"Lemmatizer interested : {lemmatizer.lemmatize('interested','v')}")
 
 
 # POS Tagging using nltk
@@ -45,6 +45,15 @@ tokenized_text = word_tokenize(text)
 print(f"tokenized text : {tokenized_text}")
 tags = pos_tag(tokenized_text)
 print(f"tags : {tags}")
+
+# Sentence Sengmentation
+
+from nltk import sent_tokenize
+
+text = "Hello world! This is a test. How are you today? I am good , how are you?"
+sentences=sent_tokenize(text)
+
+print(f"sentences : {sentences}")
 
 # NER (Named Entity Recognition) using NLTK
 
@@ -66,6 +75,13 @@ tokens = word_tokenize(text)
 removed_stopwords = [word for word in tokens if word.lower() not in stopwords.words("english")]
 print(f"removed_stopwords : {removed_stopwords}")
 
+# Language Detection
+
+from langdetect import detect
+
+text = 'আমি কলকাতায় থাকি।'
+language=detect(text)
+print(f"language : {language}")
 
 # Vectorization using NLTK
 
@@ -82,6 +98,7 @@ vectorizer = TfidfVectorizer()
 x=vectorizer.fit_transform(corpus)
 print(f"feature names: {vectorizer.get_feature_names_out()}")
 print(x.toarray())
+
 
 # Text Classification using NLTK
 
@@ -105,6 +122,43 @@ print(f"y_test: {y_test}")
 print(f"y_pred: {y_pred}")
 print(f"x_test: {x_test}")
 
+# Text Similarity
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+texts = ["NLP is fun and educational.", "NLP is fun and"]
+vectorizer=TfidfVectorizer()
+tfid_matrix = vectorizer.fit_transform(texts)
+print(f"tfid_matrix: {tfid_matrix}")
+similarity = cosine_similarity(tfid_matrix[0:1],tfid_matrix[1:2])
+print(f"Similar texts : {similarity}")
+
+# Spelling Correction
+
+from textblob import  TextBlob
+text = TextBlob("I havv aMotor Cycle")
+corrected_text = text.correct()
+print(f"corrected_text : {corrected_text}")
+
+# Text Summarization
+
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer
+
+text = """
+Natural Language Processing (NLP) is a field of Artificial Intelligence that enables computers to understand human language. It involves several tasks such as tokenization, stemming, lemmatization, and named entity recognition. NLP is widely used in applications like sentiment analysis, chatbots, and search engines.
+"""
+
+parser = PlaintextParser.from_string(text, Tokenizer("english"))
+summarizer = LsaSummarizer()
+summary = summarizer(parser.document, 2)  # Get top 2 sentences
+
+print("Summary:")
+for sentence in summary:
+    print("-", sentence)
+
 
 # Prediction using NLTK
 
@@ -115,7 +169,7 @@ texts = [
     "I love this movie",         # positive
     "This film is terrible",     # negative
     "Absolutely great!",         # positive
-    "Worst acting ever",         # negative
+    "Worst acting ever",         # negative         
     "Excellent direction",       # positive
     "Not worth watching",        # negative
     "Amazing experience",        # positive
@@ -123,17 +177,19 @@ texts = [
     "poor performance",  # negative
     "fabulous movie",  # positive
     "waste of time",  # negative
-    "movie of the year"  # positive
+    "movie of the year",  # positive
+    "waste of money",  # negative
+    "good movie"  # positive
 
 ]
 
-labels = ["positive", "negative", "positive", "negative", "positive", "negative", "positive", "negative","negative", "positive", "negative", "positive"]
+labels = ["positive", "negative", "positive", "negative", "positive", "negative", "positive", "negative","negative", "positive", "negative", "positive","negative","positive"]
 
 vectorizer = TfidfVectorizer()
 x = vectorizer.fit_transform(texts)
 
 model = LogisticRegression()
-model.fit(x,labels)
+model.fit(x, labels)
 
 def predict_sentiment(sentence):
     sentence_lower = sentence.lower()
@@ -141,10 +197,34 @@ def predict_sentiment(sentence):
     prediction = model.predict(vector)[0]
     return prediction
 
-while True:
-    user_input = input("Enter a review :")
-    print(f"user_input: {user_input}")
-    if user_input.lower().strip() =="exit" :
-        break
-    result = predict_sentiment(user_input)
-    print(f"Predicted Sentiment : {result}")
+# while True:
+#     user_input = input("Enter a review :")
+#     print(f"user_input: {user_input}")
+#     if user_input.lower().strip() =="exit" :
+#         break
+#     result = predict_sentiment(user_input)
+#     print(f"Predicted Sentiment : {result}")
+
+import pandas as pd
+pagename_df = pd.read_csv("data/pagename_details.csv")
+
+pagename_df['FPAGENAME'] = pagename_df['FPAGENAME'].fillna('')
+pagename_values=pagename_df['FPAGENAME'].tolist()
+pagename_labels=pagename_df["LABEL"].tolist()
+
+vectorizer = TfidfVectorizer()
+X=vectorizer.fit_transform(pagename_values)
+#
+model = LogisticRegression()
+model.fit(X,pagename_labels)
+
+# while True:
+#     user_input = input("Enter a page name :")
+#     print(f"user_input: {user_input}")
+#     if user_input.lower().strip() =="exit" :
+#         break
+#     result = predict_sentiment(user_input)
+#     print(f"Predicted Sentiment : {result}")
+
+
+
